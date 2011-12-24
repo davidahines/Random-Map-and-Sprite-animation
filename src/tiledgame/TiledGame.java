@@ -1,5 +1,6 @@
 package tiledgame;
 
+import com.hadesvine.tiledgame.examples.MapHelper;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
@@ -19,7 +20,10 @@ public class TiledGame extends BasicGame {
     private float moveSpeed = 1;
     private CharacterEntity testEntity;
     private boolean playerIsMoving = false;
-    private Image grassTile;
+    private Scene scene;
+    private int WIDTH = 1024;
+    private int HEIGHT = 768;
+    
 
     public TiledGame() {
         super("Tiled game");
@@ -27,17 +31,18 @@ public class TiledGame extends BasicGame {
 
     public static void main(String[] args) throws SlickException {
         AppGameContainer app = new AppGameContainer(new TiledGame());
-        app.setDisplayMode(1024, 768, true);
-
+        app.setDisplayMode(1024, 768, false);
+        app.setTargetFrameRate(60);
+        app.setFullscreen(true);
         app.start();
     }
 
-    @Override
+    @Override 
     public void init(GameContainer gc) throws SlickException {
         testEntity = new CharacterEntity(new SpriteSheet("com/hadesvine/tilegame/tiles/crono.png", 24, 32,new Color(41,156,0) ), 400, 300);
         testEntity.setWalkColumn(4);
         testEntity.setWalkDelay(200);
-        grassTile = new SpriteSheet("com/hadesvine/tilegame/tiles/crono.png", 24, 32,new Color(41,156,0));
+        scene = new Scene(new SpriteSheet("com/hadesvine/tilegame/tiles/masterEnviromentSheet.png", 32, 32,new Color(255,0,176)));
     }
 
     @Override
@@ -80,6 +85,13 @@ public class TiledGame extends BasicGame {
                 moveSpeed = 1;
             }
         }
+        if (input.isKeyDown(Input.KEY_BACK)) {
+            if(!scene.isGenerating()){
+                this.scene.setGenerating(true);
+                this.scene.setMap(MapHelper.getClarified2DIslandMap(WIDTH, HEIGHT));
+                this.scene.setGenerating(false);
+            }
+        }
         if (playerIsMoving) {
             testEntity.setState(CharacterEntity.WALK);
         } else {
@@ -90,6 +102,7 @@ public class TiledGame extends BasicGame {
 
     @Override
     public void render(GameContainer gc, Graphics g) throws SlickException {
+        scene.draw();
         Image sprite = testEntity.getSprite();
         sprite.draw(testEntity.getLocationX(), testEntity.getLocationY());
     }
